@@ -59,7 +59,7 @@ What the objection row shows in some example states:
 | PMS = AppFolio | + AppFolio AI |
 | PMS = Entrata / RealPage | + Entrata / RealPage AI |
 
-## 2. Component structure (proposed, not built yet)
+## 2. Component structure (built: `src/ui/`)
 
 ```
 <App>                         state: CallState, navStack: EntryId[]
@@ -68,15 +68,15 @@ What the objection row shows in some example states:
 │   ├─ <SegmentRow axis="persona">     Ops | Marketing | Maintenance | Finance | Ownership
 │   ├─ <SegmentRow axis="ownership">   Owner-op | Owner-only | 3rd-party | PE | Merchant | JV | REIT
 │   ├─ <SegmentRow axis="pms">         Yardi | AppFolio | Entrata | RealPage | Other
-│   └─ <NewCallButton>                 clears state + stack
-├─ <StatusStrip>              "General track" badge · gap notices · "inferred tag" badge
-├─ <Breadcrumb>               Opener › High level › [Objection: One system]   ← Back
+│   └─ New call / Collapse             collapse shrinks the bar to one summary line
+├─ <StatusStrip>              ← Back · breadcrumb (clickable) · Search · "General track" + gap notices
 ├─ <ReadingPane>              one Entry; `say` in large type, `note` smaller, `cue` italic
-│   ├─ <AltOpenerChips>       only while on the opener
-│   └─ <NextOptions>          nextFor(entry), hotkeyed Q W E R T…
+│                             stats and customer names highlighted (text itself never altered)
+│   ├─ Back to pitch          only while a rebuttal is on screen
+│   ├─ Next options           nextFor(entry), hotkeyed Q W E R T…
+│   └─ Other openers          only while on the opener, hotkeyed Z X V B N M
 ├─ <ObjectionBar>             pinned bottom; core + conditional + promoted competitors, hotkeyed 1–9
-│   ├─ <CompetitorTray>       all competitors
-│   └─ <FollowUpTray>         follow-up email patterns for this state
+│   └─ Trays                  Competitors (C) · Follow-ups (F) · Discovery cues (D); 1–9 picks inside
 └─ <CommandPalette>           "/" fuzzy search over all 69 entries, for anything not surfaced
 ```
 
@@ -86,9 +86,23 @@ What the objection row shows in some example states:
 - After a chain of objections, **"Return to pitch"** pops back to the last non-objection entry in one step.
 - Changing a classifier mid-call keeps the stack and recomputes the buttons. The opener only changes if the rep is still on it.
 
-**Keyboard and tap.** Objections are on 1–9. Next options are on Q/W/E/R/T. Esc goes back, `/` opens search, and `N` starts a new call. Every button shows its key. Buttons are at least 44px tall, and there are no dropdowns.
+**Keyboard and tap.** Every button shows its key. Buttons are at least 40–44px tall, and there are no dropdowns.
 
-**Stack.** I'd use Vite, React and TypeScript, built to one static page. That gives no backend and an instant load, and it can be hosted anywhere. Content stays in `entries.ts`, so a content change is a reviewed diff that `verify` gates.
+| Key | Action |
+|---|---|
+| 1–9 | Objection buttons (1–3 are always the core three) |
+| Q W E R T Y U I O | Next options |
+| Z X V B N M | Swap to another opener (while on the opener) |
+| P | Back to pitch (skips past chained rebuttals) |
+| Esc / Backspace | Back one step (Esc closes a tray first) |
+| C · F · D | Competitors · Follow-ups · Discovery cues trays |
+| / | Search all content |
+| ` | Collapse / expand the classifier bar |
+| Shift+N | New call |
+
+Classifier choices are saved in sessionStorage, so an accidental reload keeps them. The navigation trail is not saved; a reload returns to the opener.
+
+**Stack.** Vite, React and TypeScript, built to one static page (`npm run build` → `dist/`). There's no backend, it loads instantly, and it can be hosted anywhere. Content stays in `entries.ts`, so a content change is a reviewed diff that `verify` gates.
 
 ## 3. Tree shape (from `next` edges)
 
