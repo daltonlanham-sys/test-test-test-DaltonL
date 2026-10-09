@@ -29,7 +29,7 @@ Entry {
 - **69 entries.** Every talk track, rebuttal, proof point, deep-dive item and follow-up is its own entry.
 - **Verbatim is enforced.** `npm run verify` fails if any segment is not an exact substring of the source doc. It also fails if any substantive line of the doc is not captured, so nothing gets silently dropped. I tested both failures by changing one word and by deleting one entry.
 - **General content is the fallback.** Untagged multifamily content is `'*'` on every axis, so it matches every combination.
-- **The tags show where they came from.** `doc` means the doc itself labels the content (NOI pitch → ownership persona, Section 4 → affordable, maintenance objections → maintenance). `inferred` means I mapped it from the wording; the UI shows a small badge and `tagNote` explains the mapping. Seven entries are inferred (§5).
+- **The tags show where they came from.** `doc` means the doc itself labels the content (NOI pitch → ownership persona, Section 4 → affordable, maintenance objections → maintenance). `inferred` means I mapped it from the wording; the UI shows a small badge and `tagNote` explains the mapping. Five entries are inferred (§5).
 - **`REFERENCES`** lists the six sources the doc names. All have `url: null` because the doc gives no links. The doc does not reference a Yardi deck or an objection spreadsheet.
 - **`GAPS`** lists student, senior, the missing affordable close, the maintenance opener and the third-party fee manager script. The UI shows the relevant gap when the classifier state hits it.
 
@@ -114,7 +114,7 @@ See `docs/COVERAGE.md` (generated) for the full asset × persona × ownership gr
 
 1. **A PMS modifier as a fourth, optional row.** The "one system" objection and the Yardi, AppFolio and Entrata/RealPage rebuttals depend on the prospect's PMS, and none of the three classifiers capture that. Without a PMS row, "Yardi-heavy" can't trigger anything.
 2. **"One system" for Yardi only, or for any PMS suite?** The doc heading says "Yardi/PMS consolidation", but the script names Yardi. I currently trigger it on Yardi only.
-3. **Inferred tags (7 entries):**
+3. **Inferred tags (5 entries):**
    - Leasing/vacancy opener → marketing
    - Lease-audit opener → finance
    - CapEx → ownership + finance
