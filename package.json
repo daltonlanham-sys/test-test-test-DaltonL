@@ -13,7 +13,8 @@
     "test": "node --test 'test/*.test.ts'",
     "verify": "node scripts/verify.ts",
     "coverage": "node scripts/coverage.ts",
-    "check": "npm run verify && npm run typecheck && npm test"
+    "check": "npm run verify && npm run typecheck && npm test",
+    "build:artifact": "vite build -c vite.artifact.config.ts && node scripts/build-artifact.ts"
   },
   "dependencies": {
     "react": "19.2",

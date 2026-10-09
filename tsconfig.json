@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["src", "scripts", "test", "vite.config.ts"]
+  "include": ["src", "scripts", "test", "vite.config.ts", "vite.artifact.config.ts"]
 }

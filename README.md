@@ -6,11 +6,14 @@ Live cold-call companion for SDRs. The rep sets the asset type, persona, ownersh
 npm install
 npm run dev        # local dev server
 npm run build      # static site in dist/ — host anywhere
+npm run build:artifact  # single-file page in dist-artifact/ for the claude.ai artifact
 npm run check      # verify content + typecheck + tests
 npm run coverage   # regenerate docs/COVERAGE.md
 ```
 
 Requires Node ≥ 22.18.
+
+**Live (private):** https://claude.ai/artifact/UHJ4jLFyhb2hcwFf3N3aKZ. To update it, run `npm run build:artifact` and republish `dist-artifact/sdr-talk-track.html` to that URL. The artifact build loads React 18.3.1 from cdnjs, because React 19 has no browser-global build; the dev build uses React 19.
 
 **On a call:** set the classifiers once, then read the big text. Tap an objection (or press 1–9) when it comes up, and press **P** to get back to the pitch. **Q/W/E…** take the next step. **/** searches everything. **Shift+N** starts a new call. The full key map is in `docs/ARCHITECTURE.md`.
 
