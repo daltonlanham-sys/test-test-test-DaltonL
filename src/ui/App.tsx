@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer, useState } from 'react';
-import type { CallState, Entry } from '../data/schema.ts';
+import type { CallState, Entry, Reference } from '../data/schema.ts';
 import { ENTRIES } from '../data/entries.ts';
 import { initialNav, isRebuttal, navReducer, type NavAction, type Nav } from '../engine/nav.ts';
 import { nextFor, resolve } from '../engine/resolve.ts';
@@ -56,9 +56,9 @@ export function App() {
   const pitchTarget = isRebuttal(current) ? ([...stack].reverse().find((e) => !isRebuttal(e)) ?? null) : null;
 
   const objectionRow = [...resolved.objections, ...resolved.promotedCompetitors];
-  const trays: Record<'competitors' | 'followups' | 'cues', { title: string; items: Entry[] }> = {
+  const trays: Record<'competitors' | 'followups' | 'cues', { title: string; items: Entry[]; links?: Reference[] }> = {
     competitors: { title: 'Competitor rebuttals', items: resolved.competitors },
-    followups: { title: 'Follow-up email patterns', items: resolved.followUps },
+    followups: { title: 'Follow-ups & cadence', items: resolved.followUps, links: resolved.references },
     cues: { title: 'Discovery cues', items: resolved.discovery },
   };
 

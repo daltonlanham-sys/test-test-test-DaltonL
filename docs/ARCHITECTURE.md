@@ -26,7 +26,7 @@ Entry {
 }
 ```
 
-- **69 entries.** Every talk track, rebuttal, proof point, deep-dive item and follow-up is its own entry.
+- **123 entries.** Every talk track, rebuttal, proof point, deep-dive item and follow-up is its own entry. 69 come from the original reference and 54 from the Outreach Messaging Matrix (doc sections 11–16; see `docs/CONTENT-CHANGES.md`). Matrix entries live in `entries-matrix.ts`.
 - **Verbatim is enforced.** `npm run verify` fails if any segment is not an exact substring of the source doc. It also fails if any substantive line of the doc is not captured, so nothing gets silently dropped. I tested both failures by changing one word and by deleting one entry.
 - **General content is the fallback.** Untagged multifamily content is `'*'` on every axis, so it matches every combination.
 - **The tags show where they came from.** `doc` means the doc itself labels the content (NOI pitch → ownership persona, Section 4 → affordable, maintenance objections → maintenance). `inferred` means I mapped it from the wording; the UI shows a small badge and `tagNote` explains the mapping. Four entries are inferred (§5).
@@ -73,11 +73,13 @@ What the objection row shows in some example states:
 ├─ <ReadingPane>              one Entry; `say` in large type, `note` smaller, `cue` italic
 │                             stats and customer names highlighted (text itself never altered)
 │   ├─ Back to pitch          only while a rebuttal is on screen
-│   ├─ Next options           nextFor(entry), hotkeyed Q W E R T…
+│   ├─ Next options           nextFor(entry), hotkeyed Q W E R T… From an opener, the persona/asset
+│   │                         value props ("hubs") for this state come first
 │   └─ Other openers          only while on the opener, hotkeyed Z X V B N M
 ├─ <ObjectionBar>             pinned bottom; core + conditional + promoted competitors, hotkeyed 1–9
-│   └─ Trays                  Competitors (C) · Follow-ups (F) · Discovery cues (D); 1–9 picks inside
-└─ <CommandPalette>           "/" fuzzy search over all 69 entries, for anything not surfaced
+│   └─ Trays                  Competitors (C) · Follow-ups (F, plus this persona's email-template docs)
+│                             · Discovery cues (D); 1–9 picks inside
+└─ <CommandPalette>           "/" fuzzy search over every entry, for anything not surfaced
 ```
 
 **Navigation.** `navStack` is a stack of entry ids.
@@ -118,7 +120,10 @@ Classifier choices are saved in sessionStorage, so an accidental reload keeps th
 
 See `docs/COVERAGE.md` (generated) for the full asset × persona × ownership grid.
 
-- **Student and senior housing:** no dedicated content. They fall back to the general track and show a "needs build-out" notice. (Section 7 of the doc confirms this.)
+- **Student housing:** discovery themes and a linked sequence doc, but no talk track. The doc couldn't be opened from this session.
+- **Senior housing:** no talk track. The "Want a human" objection covers older residents.
+- **Regional and exec:** value props, but no opener.
+- **Bad-review track (ops):** problem statement only; the sheet has no value prop or proof for it.
 - **Affordable close:** the doc lists a close beat but gives no close script.
 - **Maintenance persona:** has rebuttals and proof, but no opener.
 - **Lease-up (secondary):** one capability note, no opener and no read-aloud script. Not a build-out priority.
@@ -136,11 +141,11 @@ Confirmed:
 
 Still open:
 - **Inferred tags (4 entries):**
-  - Leasing/vacancy opener → marketing
+  - Leasing/vacancy opener → leasing (was marketing)
   - Lease-audit opener → finance
   - CapEx → ownership + finance
   - Fee-manager track → owner-only, PE, JV (not REIT)
-- **The persona list:** ops, marketing, maintenance, finance, ownership. Add others (IT/tech, executive) only once content exists for them.
+- **The persona list** is now ops, marketing, leasing, maintenance, finance, regional, ownership / AM and exec / C-suite. Leasing, regional and exec were added with the Outreach Messaging Matrix, which has content for them.
 
 ## 6. Content inconsistencies in the source doc (left as written)
 

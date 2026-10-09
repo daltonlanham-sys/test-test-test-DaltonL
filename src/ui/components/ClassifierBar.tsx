@@ -15,8 +15,10 @@ const ROWS: { axis: Axis; label: string; values: readonly string[]; names: Recor
 // Values with no dedicated content get a "general" marker so the rep knows
 // up front that picking them changes nothing. Conventional and "Other" PMS
 // are the general track by definition, so they aren't marked.
+// Discovery cues alone don't count: there's still nothing to say.
 const hasContent = (axis: Axis, v: string) =>
   ENTRIES.some((e) => {
+    if (e.kind === 'discovery') return false;
     const a = e.appliesTo[axis as keyof AppliesTo];
     return a !== '*' && (a as readonly string[]).includes(v);
   });

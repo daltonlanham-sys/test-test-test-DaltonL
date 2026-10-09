@@ -6,7 +6,7 @@
 // Exits non-zero on any failure.
 
 import { readFileSync } from 'node:fs';
-import { ENTRIES } from '../src/data/entries.ts';
+import { ENTRIES, REFERENCES } from '../src/data/entries.ts';
 
 const raw = readFileSync(new URL('../content/master-reference.md', import.meta.url), 'utf8');
 
@@ -41,8 +41,16 @@ const EXEMPT = [
   /^These are the detailed product capabilities/,
   /^These convert a connect/,
   /^Four of the five dimensions/, // section 7, encoded as GAPS
+  /^Format: /, // section framing (11–16)
+  /^<!-- /,
 ];
-const segTexts = ENTRIES.flatMap((e) => e.body.map((s) => s.text));
+// Entry titles and reference lines count as captured too (headings, link lists).
+const segTexts = [
+  ...ENTRIES.flatMap((e) => [...e.body.map((s) => s.text), e.title]),
+  ...REFERENCES.flatMap((r) => [r.title, r.note ?? '', r.url ?? '']),
+]
+  .filter(Boolean)
+  .sort((a, b) => b.length - a.length);
 const covered = (line: string) => {
   let rest = line;
   for (const t of segTexts) if (rest.includes(t)) rest = rest.split(t).join('');

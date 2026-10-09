@@ -1,16 +1,17 @@
-import type { Entry } from '../../data/schema.ts';
+import type { Entry, Reference } from '../../data/schema.ts';
 import { triggerLabel } from './ObjectionBar.tsx';
 import { Key } from './Key.tsx';
 
 type Props = {
   title: string;
   items: Entry[];
+  links?: Reference[]; // external docs, e.g. persona email templates
   onPick: (id: string) => void;
   onClose: () => void;
 };
 
 // Pop-up list above the objection bar. Number keys pick (handled in App).
-export function Tray({ title, items, onPick, onClose }: Props) {
+export function Tray({ title, items, links = [], onPick, onClose }: Props) {
   return (
     <div className="overlay" onClick={onClose}>
       <div className="tray" role="dialog" aria-label={title} onClick={(e) => e.stopPropagation()}>
@@ -33,6 +34,16 @@ export function Tray({ title, items, onPick, onClose }: Props) {
             );
           })}
         </div>
+        {links.length > 0 && (
+          <div className="tray__links">
+            <h3>Email templates &amp; sources</h3>
+            {links.map((r) => (
+              <a key={r.id} href={r.url!} target="_blank" rel="noreferrer" title={r.note}>
+                {r.title} ↗
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

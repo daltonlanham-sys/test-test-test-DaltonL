@@ -17,7 +17,16 @@ export type AssetType = (typeof ASSET_TYPES)[number];
 // and not targeted for content build-out.
 export const SECONDARY_ASSET_TYPES: readonly AssetType[] = ['lease_up'];
 
-export const PERSONAS = ['ops', 'marketing', 'maintenance', 'finance', 'ownership'] as const;
+export const PERSONAS = [
+  'ops',
+  'marketing',
+  'leasing',
+  'maintenance',
+  'finance',
+  'regional',
+  'ownership',
+  'executive',
+] as const;
 export type Persona = (typeof PERSONAS)[number];
 
 export const OWNERSHIP = [
@@ -98,6 +107,10 @@ export type Entry = {
   situation?: 'win_back'; // only relevant in a specific call situation
   customers?: readonly string[]; // customer names exactly as they appear in body
   next?: readonly string[]; // tree edges: entry ids offered as "next" from here
+  // Entry point for a persona/asset: offered from every opener (and the
+  // high-level pitch) whenever it matches the call state.
+  hub?: boolean;
+  offersHubs?: boolean; // non-opener entries that list hubs in their next options
   source: { section: string; heading: string; attribution?: string };
 };
 
@@ -107,6 +120,7 @@ export type Reference = {
   owner?: string;
   url: string | null; // null = doc names it but gives no link
   note?: string;
+  appliesTo?: Partial<AppliesTo>; // shown in the Follow-ups tray when it matches
 };
 
 export type Gap = {

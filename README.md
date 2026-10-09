@@ -1,6 +1,6 @@
 # EliseAI SDR Talk Track Tool
 
-Live cold-call companion for SDRs. The rep sets the asset type, persona, ownership structure and PMS, and the tool loads the right opener and objection buttons. All content comes from `content/master-reference.md`.
+Live cold-call companion for SDRs. The rep sets the asset type, persona, ownership structure and PMS, and the tool loads the right opener and objection buttons. All content comes from `content/master-reference.md`, which now includes the Outreach Messaging Matrix sheet (sections 11–16).
 
 ```
 npm install
@@ -18,8 +18,9 @@ Requires Node ≥ 22.18.
 **On a call:** set the classifiers once, then read the big text. Tap an objection (or press 1–9) when it comes up, and press **P** to get back to the pitch. **Q/W/E…** take the next step. **/** searches everything. **Shift+N** starts a new call. The full key map is in `docs/ARCHITECTURE.md`.
 
 - `docs/ARCHITECTURE.md`: data model, components, key map, decisions
+- `docs/CONTENT-CHANGES.md`: what the Outreach Messaging Matrix added and every stat/wording edit, with before/after
 - `docs/COVERAGE.md`: which classifier combinations have dedicated content (generated)
-- `src/data/entries.ts`: every talk track, rebuttal, proof point and follow-up, verbatim
+- `src/data/entries.ts` + `entries-matrix.ts`: every talk track, rebuttal, proof point and follow-up, verbatim from the reference doc
 - `src/engine/`: classifier state → opener and objections (`resolve`), call navigation (`nav`), search
 - `src/ui/`: React components
 

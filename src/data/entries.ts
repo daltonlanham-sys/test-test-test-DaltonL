@@ -2,14 +2,10 @@
 // every segment must stay a verbatim substring of the source doc
 // (enforced by `npm run verify`). Change the doc, then re-extract.
 
-import type { AppliesTo, Entry, Gap, Reference, Segment } from './schema.ts';
+import type { Entry, Gap, Reference } from './schema.ts';
+import { ALL, cue, note, only, say } from './build.ts';
+import { MATRIX_ENTRIES, MATRIX_REFERENCES } from './entries-matrix.ts';
 
-const say = (text: string): Segment => ({ t: 'say', text });
-const note = (text: string): Segment => ({ t: 'note', text });
-const cue = (text: string): Segment => ({ t: 'cue', text });
-
-const ALL: AppliesTo = { asset: '*', persona: '*', ownership: '*', pms: '*' };
-const only = (a: Partial<AppliesTo>): AppliesTo => ({ ...ALL, ...a });
 
 const S1 = '1. Openers / High-Level Intro';
 const S2 = '2. Persona / Ownership Talk Tracks';
@@ -24,10 +20,9 @@ const S10 = '10. Follow-Up Email Patterns';
 const FEE_MANAGED_OWNERS = ['owner_only', 'private_equity', 'joint_venture'] as const;
 
 // Default "what to say next" from any general opener.
-// track.lease_up only surfaces when asset = lease_up (nextFor filters by state).
-const GENERAL_NEXT = ['track.lease_up', 'track.high_level', 'proof.leasing_ai', 'proof.delinquency', 'proof.lease_audits'];
+const GENERAL_NEXT = ['track.high_level', 'proof.leasing_ai', 'proof.delinquency', 'proof.lease_audits'];
 
-export const ENTRIES: readonly Entry[] = [
+const BASE_ENTRIES: readonly Entry[] = [
   // ── 1. Openers ──────────────────────────────────────────────────────────
   {
     id: 'opener.standard',
@@ -77,7 +72,10 @@ export const ENTRIES: readonly Entry[] = [
       'proof.maintenance',
       'proof.lease_audits',
       'track.apollo',
+      'why.scale',
+      'why.voice',
     ],
+    offersHubs: true,
     source: { section: S1, heading: 'Elise high level (plain)' },
   },
   {
@@ -210,7 +208,7 @@ export const ENTRIES: readonly Entry[] = [
     ],
     appliesTo: only({ persona: ['ownership'] }),
     tagSource: 'doc',
-    next: ['track.lease_up', 'noi.frame', 'track.owner_past_fee_manager', 'track.capex'],
+    next: ['noi.frame', 'track.owner_past_fee_manager', 'track.capex'],
     source: { section: S2, heading: 'Ownership — portfolio performance framing' },
   },
   {
@@ -262,11 +260,12 @@ export const ENTRIES: readonly Entry[] = [
     title: 'Leasing AI',
     body: [
       note(
-        'Lead-to-lease conversion 50–60% (vs ~30% industry avg); +2% occupancy lift benchmarked across 4K+ communities.',
+        'Lead-to-lease conversion 50–60% (vs ~30% industry avg); 2% higher occupancy than local markets in a third-party ALN study of 3,700+ communities. Kittle Property Group: 90%+ of leasing conversations handled by AI, lead-to-lease time cut 65%, ad spend down ~40%. Avenue5: lead-to-lease conversion up 21%+ across 50,000 units.',
       ),
     ],
     appliesTo: ALL,
     tagSource: 'general',
+    customers: ['Kittle Property Group', 'Avenue5'],
     next: ['proof.aigt', 'proof.voice_ai', 'track.zillow'],
     source: { section: S3, heading: 'Leasing AI' },
   },
@@ -302,7 +301,7 @@ export const ENTRIES: readonly Entry[] = [
     title: 'Voice AI',
     body: [
       note(
-        'automates 90% of inbound/outbound calls, reduces agent workload 87%, 29-second avg response; 33% more leads entering funnel via AI-managed calls; 50% of calls are missed by on-site teams today.',
+        'automates 90% of inbound/outbound calls, reduces agent workload 87%, 29-second avg response; 33% more leads entering funnel via AI-managed calls; 50% of calls are missed by on-site teams today. The biggest voice product in any industry — 30M calls a year.',
       ),
     ],
     appliesTo: ALL,
@@ -315,12 +314,12 @@ export const ENTRIES: readonly Entry[] = [
     title: 'Delinquency',
     body: [
       note(
-        '40% reduction in delinquency (AI handles 90% of payment comms); collections up 41% post-AI; cash flow accelerated 11 days; 85% less time managing delinquencies. Cardinal Group went 7% to 4%. Summit recovered ~$3M. No percentage fee taken.',
+        '40% reduction in delinquency (AI handles 90% of payment comms); collections up 41% post-AI; cash flow accelerated 11 days; 85% less time managing delinquencies. Cardinal Group went 7% to 4%. Summit recovered ~$3M. Asset Living improved on-time payments by 600 basis points. No percentage fee taken.',
       ),
     ],
     appliesTo: ALL,
     tagSource: 'general',
-    customers: ['Cardinal Group', 'Summit'],
+    customers: ['Cardinal Group', 'Summit', 'Asset Living'],
     next: ['detail.delinquency_ai', 'detail.demand_notices', 'detail.outbound_calling'],
     source: { section: S3, heading: 'Resident AI' },
   },
@@ -328,7 +327,7 @@ export const ENTRIES: readonly Entry[] = [
     id: 'proof.renewals',
     kind: 'proof_point',
     title: 'Renewals',
-    body: [note('97.1% renewal rate; +10% renewal rate; $1.5M+ additional revenue; automated 30/60/90-day outreach.')],
+    body: [note('97.1% renewal rate; +10% renewal rate; $1.5M+ additional revenue; automated 30/60/90-day outreach; 84% of renewal conversations automated, renewal reply rates up 20%.')],
     appliesTo: ALL,
     tagSource: 'general',
     next: ['detail.pre_renewal', 'detail.cross_selling', 'detail.renewal_portal', 'detail.renewal_prediction'],
@@ -340,7 +339,7 @@ export const ENTRIES: readonly Entry[] = [
     title: 'Maintenance',
     body: [
       note(
-        '26% reduction in emergency calls; Student Quarters saved 533 hours and $27K annually; AI-powered auto-assignment and scheduling.',
+        '26% reduction in emergency calls; Student Quarters saved 533 hours and $27K annually; AI-powered auto-assignment and scheduling; customers saved 11,700+ maintenance hours in six months.',
       ),
       note('Pitch:'),
       say('Let your techs turn wrenches instead of answering calls, triaging emergencies, and managing work orders.'),
@@ -400,6 +399,7 @@ export const ENTRIES: readonly Entry[] = [
     ],
     appliesTo: only({ asset: ['lease_up'] }),
     tagSource: 'doc',
+    hub: true,
     tagNote: 'Section 7 names this the lease-up/development track under asset type.',
     next: ['proof.aigt'],
     source: { section: S3, heading: 'Lease-up / development' },
@@ -764,7 +764,7 @@ export const ENTRIES: readonly Entry[] = [
     appliesTo: only({ persona: ['ops'] }),
     tagSource: 'doc',
     tagNote: 'Script is addressed to "ops leaders".',
-    next: ['track.lease_up', 'discovery.property_managers', 'track.high_level', 'proof.voice_ai', 'proof.delinquency'],
+    next: ['discovery.property_managers', 'track.high_level', 'proof.voice_ai', 'proof.delinquency'],
     source: { section: S8, heading: 'Operational efficiency angle' },
   },
   {
@@ -776,10 +776,10 @@ export const ENTRIES: readonly Entry[] = [
         "A lot of the property management companies I talk to are losing leads after hours when nobody's in the office to pick up. Is that something you're running into, or have you guys figured that out?",
       ),
     ],
-    appliesTo: only({ persona: ['marketing'] }),
+    appliesTo: only({ persona: ['leasing'] }),
     tagSource: 'inferred',
-    tagNote: 'Leasing/lead-capture angle with no persona label. Mapped to marketing (owns lead spend and leasing funnel).',
-    next: ['track.lease_up', 'proof.leasing_ai', 'proof.voice_ai', 'track.zillow'],
+    tagNote: 'Leasing/lead-capture angle with no persona label. Mapped to the leasing persona (the sheet\'s Leasing/Sales lane).',
+    next: ['proof.leasing_ai', 'proof.voice_ai', 'track.zillow'],
     source: { section: S8, heading: 'Leasing / vacancy angle' },
   },
   {
@@ -802,7 +802,7 @@ export const ENTRIES: readonly Entry[] = [
     title: 'Mystery shop opener (email)',
     body: [
       say(
-        "I had my team mystery shop a sample of your properties. 33% never responded. Of those that did, initial response time averaged 26 hours 55 minutes, agents only answered 50% of leads' questions, followed up 0.8 times per lead, and attempted to schedule a tour 0.8 times per lead. We're a conversational AI platform purpose-built for residential, live in 3M+ units with 400+ teams.",
+        "I had my team mystery shop a sample of your properties. 33% never responded. Of those that did, initial response time averaged 26 hours 55 minutes, agents only answered 50% of leads' questions, followed up 0.8 times per lead, and attempted to schedule a tour 0.8 times per lead. We're a conversational AI platform purpose-built for residential, live in 6M+ units.",
       ),
     ],
     appliesTo: ALL,
@@ -822,7 +822,7 @@ export const ENTRIES: readonly Entry[] = [
     appliesTo: only({ persona: ['finance'] }),
     tagSource: 'inferred',
     tagNote: 'Addressed to someone who "handles audit responsibilities". Mapped to finance.',
-    next: ['track.lease_up', 'proof.lease_audits', 'proof.delinquency'],
+    next: ['proof.lease_audits', 'proof.delinquency'],
     source: { section: S8, heading: 'Lease audit opener' },
   },
   {
@@ -1011,7 +1011,7 @@ export const ENTRIES: readonly Entry[] = [
     title: 'Highlights follow-up (broad)',
     body: [
       note(
-        'Live across 4M+ units, boosting revenue without extra headcount. Delinquency 40% reduction / 11-day cash flow / $3M collected; Lease Audits ~8% / $1.6M; Voice AI 90% of calls / 29-sec response; Maintenance 26% fewer emergency calls / $27K saved at Student Quarters; Renewals 97.1% rate / $1.5M+ captured.',
+        'Live across 6M+ units, boosting revenue without extra headcount. Delinquency 40% reduction / 11-day cash flow / $3M collected; Lease Audits ~8% / $1.6M; Voice AI 90% of calls / 29-sec response; Maintenance 26% fewer emergency calls / $27K saved at Student Quarters; Renewals 97.1% rate / $1.5M+ captured.',
       ),
     ],
     appliesTo: ALL,
@@ -1027,7 +1027,7 @@ export const ENTRIES: readonly Entry[] = [
     body: [
       say("We're not a lead source — we're the engine that converts them."),
       note(
-        '50–60% lead-to-lease (vs 30% avg), +2% occupancy lift across 4K+ communities, 90%+ call coverage 24/7. Offer a pilot period to fine-tune configs and prove ROI before full rollout.',
+        '50–60% lead-to-lease (vs 30% avg), 2% higher occupancy than local markets (third-party ALN study, 3,700+ communities), 90%+ call coverage 24/7. Offer a pilot period to fine-tune configs and prove ROI before full rollout.',
       ),
     ],
     appliesTo: ALL,
@@ -1037,10 +1037,12 @@ export const ENTRIES: readonly Entry[] = [
   },
 ];
 
+export const ENTRIES: readonly Entry[] = [...BASE_ENTRIES, ...MATRIX_ENTRIES];
+
 // Sources the doc names. The doc gives no links ("Source doc IDs retained in
 // project notes"), so url is null until someone supplies them. The doc does
 // not reference a Yardi deck or an objection spreadsheet.
-export const REFERENCES: readonly Reference[] = [
+const BASE_REFERENCES: readonly Reference[] = [
   { id: 'ref.talk_tracks', title: 'Talk Tracks!', owner: 'quinn.wayman', url: null },
   { id: 'ref.cold_call_cheat_sheet', title: 'Cold Call Cheat Sheet', owner: 'Izzy', url: null },
   { id: 'ref.jk_cold_calling', title: 'JK Cold Calling', owner: 'Jonathan', url: null },
@@ -1049,18 +1051,22 @@ export const REFERENCES: readonly Reference[] = [
   { id: 'ref.slack_competitors', title: 'Slack #competitors', url: null },
 ];
 
+export const REFERENCES: readonly Reference[] = [...BASE_REFERENCES, ...MATRIX_REFERENCES];
+
 // Content holes the tool must show rather than paper over.
 export const GAPS: readonly Gap[] = [
   {
     id: 'gap.student',
     appliesTo: { asset: ['student'] },
-    description: 'No dedicated student housing talk track. Falls back to the general multifamily track.',
+    description:
+      'No student housing talk track yet: discovery themes only. The Student Housing sequence doc is linked under Follow-ups.',
     source: '7. The Gap to Fill',
   },
   {
     id: 'gap.senior',
     appliesTo: { asset: ['senior'] },
-    description: 'No dedicated senior housing talk track. Falls back to the general multifamily track.',
+    description:
+      'No senior housing talk track. Falls back to the general track; the "Want a human" objection covers older residents.',
     source: '7. The Gap to Fill',
   },
   {
@@ -1081,7 +1087,18 @@ export const GAPS: readonly Gap[] = [
     id: 'gap.maintenance_opener',
     appliesTo: { persona: ['maintenance'] },
     description:
-      'Maintenance persona has four objection rebuttals and proof points but no opener. Uses the general opener.',
+      'Maintenance has value props and four rebuttals but no opener. Uses the general opener.',
+  },
+  {
+    id: 'gap.regional_exec_opener',
+    appliesTo: { persona: ['regional', 'executive'] },
+    description: 'No opener for regional or exec titles yet. Uses the general opener; their value props are under Next.',
+  },
+  {
+    id: 'gap.reviews_track',
+    appliesTo: { persona: ['ops'] },
+    description: 'The "bad review impact" track has a problem statement only: the sheet has no value prop or proof for it.',
+    source: '13. Problem-Statement Talk Tracks',
   },
   {
     id: 'gap.third_party_fee_manager',

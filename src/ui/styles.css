@@ -579,6 +579,25 @@ mark {
   padding: 8px 14px;
   color: var(--text-3);
 }
+.tray__links {
+  display: grid;
+  gap: 4px;
+  padding: 10px 14px 14px;
+  border-top: 1px solid var(--border);
+}
+.tray__links h3 {
+  margin: 0 0 2px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-3);
+}
+.tray__links a {
+  color: var(--accent);
+  font-size: 0.9rem;
+  padding: 4px 0;
+}
 .palette__input {
   width: 100%;
   padding: 16px;

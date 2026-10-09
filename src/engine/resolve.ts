@@ -1,7 +1,7 @@
 // Matrix → tree: turns the classifier state into what the UI shows.
 
-import type { AppliesTo, Axis, CallState, Entry, Gap } from '../data/schema.ts';
-import { ENTRIES, GAPS } from '../data/entries.ts';
+import type { AppliesTo, Axis, CallState, Entry, Gap, Reference } from '../data/schema.ts';
+import { ENTRIES, GAPS, REFERENCES } from '../data/entries.ts';
 
 const AXES = ['asset', 'persona', 'ownership', 'pms'] as const;
 
@@ -39,6 +39,7 @@ export type Resolved = {
   followUps: Entry[];
   isFallback: boolean; // true when nothing state-specific was found for the opener
   gaps: Gap[];
+  references: Reference[]; // template docs etc. for this state, most specific first
 };
 
 export function resolve(state: CallState, entries: readonly Entry[] = ENTRIES): Resolved {
@@ -70,21 +71,32 @@ export function resolve(state: CallState, entries: readonly Entry[] = ENTRIES): 
     discovery: of('discovery').sort(bySpecificity),
     followUps: of('follow_up').sort(bySpecificity),
     isFallback: specificity(opener.appliesTo) === 0,
-    gaps: GAPS.filter((g) => gapMatches(g, state)),
+    gaps: GAPS.filter((g) => partialMatches(g.appliesTo, state)),
+    references: REFERENCES.filter((r) => r.url && partialMatches(r.appliesTo ?? {}, state)).sort(
+      (a, b) => Object.keys(b.appliesTo ?? {}).length - Object.keys(a.appliesTo ?? {}).length,
+    ),
   };
 }
 
-function gapMatches(gap: Gap, state: CallState): boolean {
+function partialMatches(appliesTo: Partial<AppliesTo>, state: CallState): boolean {
   return AXES.every((k) => {
-    const axis = gap.appliesTo[k];
+    const axis = appliesTo[k];
     return axis === undefined || axis === '*' || (state[k] !== null && (axis as readonly unknown[]).includes(state[k]));
   });
 }
 
-// Tree navigation: what to offer after the current entry.
+// Tree navigation: what to offer after the current entry. Openers (and
+// entries marked offersHubs) also offer every hub that matches the call state
+// (persona and asset entry points), most specific first, ahead of their own
+// edges.
 export function nextFor(entry: Entry, state: CallState, entries: readonly Entry[] = ENTRIES): Entry[] {
   const byId = new Map(entries.map((e) => [e.id, e]));
-  return (entry.next ?? [])
+  const hubs =
+    entry.kind === 'opener' || entry.offersHubs
+      ? entries.filter((e) => e.hub && e.id !== entry.id && matches(e.appliesTo, state)).sort(bySpecificity)
+      : [];
+  const edges = (entry.next ?? [])
     .map((id) => byId.get(id))
     .filter((e): e is Entry => !!e && matches(e.appliesTo, state));
+  return [...new Map([...hubs, ...edges].map((e) => [e.id, e])).values()];
 }

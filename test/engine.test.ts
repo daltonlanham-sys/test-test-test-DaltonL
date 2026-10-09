@@ -16,7 +16,7 @@ test('blank state loads the general opener and only core objections', () => {
   const r = resolve(BLANK);
   assert.equal(r.opener.id, 'opener.standard');
   assert.equal(r.isFallback, true);
-  assert.deepEqual(labels(BLANK), ['Not interested', 'We have a bot', 'What is Elise?']);
+  assert.deepEqual(labels(BLANK), ['Not interested', 'We have a bot', 'What is Elise?', 'Want a human']);
   assert.deepEqual(r.promotedCompetitors, []);
 });
 
@@ -35,7 +35,7 @@ test('Yardi surfaces "one system" and promotes Yardi competitor rebuttals', () =
   assert.ok(r.objections.some((e) => e.id === 'obj.one_system'));
   assert.deepEqual(
     r.promotedCompetitors.map((e) => e.id),
-    ['comp.yardi_virtuoso', 'comp.yardi_integration'],
+    ['comp.yardi_virtuoso', 'comp.yardi_integration', 'comp.yardi_customers'],
   );
   assert.ok(!resolve({ ...BLANK, pms: 'appfolio' }).objections.some((e) => e.id === 'obj.one_system'));
 });
@@ -49,7 +49,7 @@ test('student and senior fall back to the general track and report a gap', () =>
 });
 
 test('lease-up track is offered from every phone opener only when asset = lease_up', () => {
-  for (const persona of [null, 'ops', 'marketing', 'finance', 'ownership'] as const) {
+  for (const persona of [null, 'ops', 'marketing', 'leasing', 'finance', 'regional', 'ownership', 'executive'] as const) {
     const on = { ...BLANK, asset: 'lease_up', persona } as const;
     const off = { ...BLANK, asset: 'conventional', persona } as const;
     assert.ok(nextFor(resolve(on).opener, on).some((e) => e.id === 'track.lease_up'), `persona ${persona}`);
@@ -60,13 +60,48 @@ test('lease-up track is offered from every phone opener only when asset = lease_
 test('every state resolves; every conditional rebuttal is reachable from some state', () => {
   const surfaced = new Set<string>();
   for (const asset of [null, 'conventional', 'affordable', 'student', 'senior', 'lease_up'] as const)
-    for (const persona of [null, 'ops', 'marketing', 'maintenance', 'finance', 'ownership'] as const)
+    for (const persona of [null, 'ops', 'marketing', 'leasing', 'maintenance', 'finance', 'regional', 'ownership', 'executive'] as const)
       for (const pms of [null, 'yardi', 'appfolio', 'entrata', 'realpage', 'other'] as const) {
         const r = resolve({ asset, persona, ownership: null, pms });
         [...r.objections, ...r.competitors].forEach((e) => surfaced.add(e.id));
       }
   const rebuttals = ENTRIES.filter((e) => e.objection).map((e) => e.id);
   assert.deepEqual(rebuttals.filter((id) => !surfaced.has(id)), []);
+});
+
+test('each persona opens on its own opener where one exists', () => {
+  const opener = (persona: CallState['persona']) => resolve({ ...BLANK, persona }).opener.id;
+  assert.equal(opener('marketing'), 'opener.marketing_occupancy');
+  assert.equal(opener('leasing'), 'opener.leasing_vacancy');
+  assert.equal(opener('ops'), 'opener.ops_efficiency');
+  assert.equal(opener('ownership'), 'opener.ownership_portfolio');
+  assert.equal(opener('regional'), 'opener.standard'); // no regional opener yet
+});
+
+test('openers offer the persona and asset value props for the call state first', () => {
+  for (const [persona, prefix] of [
+    ['marketing', 'pain.mkt_'],
+    ['leasing', 'pain.lsg_'],
+    ['ops', 'pain.ops_'],
+    ['maintenance', 'pain.mnt_'],
+    ['regional', 'pain.reg_'],
+    ['ownership', 'pain.am_'],
+    ['executive', 'pain.exec_'],
+  ] as const) {
+    const s = { ...BLANK, persona };
+    const next = nextFor(resolve(s).opener, s).map((e) => e.id);
+    assert.ok(next[0].startsWith(prefix) || next[0].startsWith('problem.'), `${persona}: ${next[0]}`);
+    assert.ok(!next.some((id) => id.startsWith('pain.') && !id.startsWith(prefix)), `${persona} leaks other lanes`);
+  }
+  const aff = { ...BLANK, asset: 'affordable' } as const;
+  assert.ok(nextFor(resolve(aff).opener, aff).some((e) => e.id === 'pain.aff_compliance'));
+});
+
+test('follow-ups tray gets the persona template doc, most specific first', () => {
+  const refs = resolve({ ...BLANK, persona: 'leasing' }).references.map((r) => r.id);
+  assert.equal(refs[0], 'ref.seq_leasing');
+  assert.ok(!refs.includes('ref.seq_marketing'));
+  assert.ok(refs.includes('ref.matrix'));
 });
 
 test('nav: objection then return-to-pitch snaps back past chained rebuttals', () => {

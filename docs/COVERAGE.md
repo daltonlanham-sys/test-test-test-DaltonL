@@ -8,8 +8,8 @@ falls back to the general multifamily track. The full matrix leaves PMS unset.
 | Value | Dedicated entries | Opener | Status |
 |---|---|---|---|
 | conventional | — | `opener.standard` | general track (this *is* the default) |
-| affordable | `aff.beats`, `aff.open`, `aff.numbers`, `aff.screened_out`, `aff.recerts`, `aff.fitch_irick`, `aff.compliance`, `aff.scale`, `fu.affordable` | `aff.open` | ✓ |
-| student | — | `opener.standard` | ⚠️ **FALLBACK — needs content** |
+| affordable | `aff.beats`, `aff.open`, `aff.numbers`, `aff.screened_out`, `aff.recerts`, `aff.fitch_irick`, `aff.compliance`, `aff.scale`, `fu.affordable`, `pain.aff_rent`, `pain.aff_support`, `pain.aff_compliance`, `pain.aff_language`, `pain.aff_budget`, `discovery.affordable` | `aff.open` | ✓ |
+| student | `discovery.student` | `opener.standard` | ◐ **discovery cues only — needs a talk track** |
 | senior | — | `opener.standard` | ⚠️ **FALLBACK — needs content** |
 | lease_up | `track.lease_up` | `opener.standard` | ✓ _(secondary, not a priority)_ |
 
@@ -17,11 +17,14 @@ falls back to the general multifamily track. The full matrix leaves PMS unset.
 
 | Value | Dedicated entries | Opener | Status |
 |---|---|---|---|
-| ops | `discovery.property_managers`, `opener.ops_efficiency` | `opener.ops_efficiency` | ✓ |
-| marketing | `opener.leasing_vacancy` | `opener.leasing_vacancy` | ◐ inferred tags only — confirm |
-| maintenance | `obj.maint_not_tech`, `obj.maint_tracking`, `obj.maint_devices`, `obj.maint_scheduling` | `opener.standard` | ✓ |
-| finance | `track.capex`, `opener.lease_audit` | `opener.lease_audit` | ◐ inferred tags only — confirm |
-| ownership | `noi.frame`, `noi.opex`, `noi.revenue`, `noi.renewals`, `noi.delinquency`, `noi.close`, `track.owner_past_fee_manager`, `opener.ownership_portfolio`, `track.capex`, `discovery.asset_management` | `opener.ownership_portfolio` | ✓ |
+| ops | `discovery.property_managers`, `opener.ops_efficiency`, `pain.ops_stable`, `pain.ops_noi`, `pain.ops_renewals`, `problem.ops_reviews`, `discovery.ops_matrix` | `opener.ops_efficiency` | ✓ |
+| marketing | `pain.mkt_occupancy`, `pain.mkt_visibility`, `pain.mkt_brand`, `problem.mkt_occupancy`, `problem.mkt_visibility`, `opener.marketing_occupancy`, `discovery.marketing` | `opener.marketing_occupancy` | ✓ |
+| leasing | `opener.leasing_vacancy`, `pain.lsg_followup`, `pain.lsg_tours`, `pain.lsg_burnout`, `problem.lsg_followup`, `problem.lsg_discounting`, `discovery.leasing` | `opener.leasing_vacancy` | ✓ |
+| maintenance | `obj.maint_not_tech`, `obj.maint_tracking`, `obj.maint_devices`, `obj.maint_scheduling`, `pain.mnt_service`, `pain.mnt_burnout`, `pain.mnt_visibility`, `discovery.maintenance` | `opener.standard` | ✓ |
+| finance | `track.capex`, `opener.lease_audit`, `discovery.finance` | `opener.lease_audit` | ✓ |
+| regional | `pain.reg_occupancy`, `pain.reg_onsite`, `pain.reg_consistency`, `discovery.regional` | `opener.standard` | ✓ |
+| ownership | `noi.frame`, `noi.opex`, `noi.revenue`, `noi.renewals`, `noi.delinquency`, `noi.close`, `track.owner_past_fee_manager`, `opener.ownership_portfolio`, `track.capex`, `discovery.asset_management`, `pain.am_noi`, `pain.am_risk`, `pain.am_cashflow`, `discovery.asset_mgmt_matrix` | `opener.ownership_portfolio` | ✓ |
+| executive | `pain.exec_noi`, `pain.exec_scale`, `pain.exec_risk`, `discovery.executive` | `opener.standard` | ✓ |
 
 ## By ownership
 
@@ -39,7 +42,7 @@ falls back to the general multifamily track. The full matrix leaves PMS unset.
 
 | Value | Dedicated entries | Opener | Status |
 |---|---|---|---|
-| yardi | `obj.one_system`, `comp.yardi_virtuoso`, `comp.yardi_integration` | `opener.standard` | ✓ |
+| yardi | `obj.one_system`, `comp.yardi_virtuoso`, `comp.yardi_integration`, `comp.yardi_customers` | `opener.standard` | ✓ |
 | appfolio | `comp.appfolio_realm_x` | `opener.standard` | ✓ |
 | entrata | `comp.entrata_realpage` | `opener.standard` | ✓ |
 | realpage | `comp.entrata_realpage` | `opener.standard` | ✓ |
@@ -48,35 +51,50 @@ falls back to the general multifamily track. The full matrix leaves PMS unset.
 ## Full matrix
 
 Each cell shows which classifiers contribute dedicated content: **A**sset, **P**ersona, **O**wnership (`·` = none,
-that slot is general track). Student and senior rows never get an A. Lease-up gets an A from its capability note only.
+that slot is general track). Discovery cues are not counted. Student and senior rows never get an A; lease-up gets one from its capability note only.
 
 | Asset / Persona | owner_operator | owner_only | third_party | private_equity | merchant_builder | joint_venture | reit |
 |---|---|---|---|---|---|---|---|
 | conventional / ops | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | conventional / marketing | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
+| conventional / leasing | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | conventional / maintenance | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | conventional / finance | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
+| conventional / regional | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | conventional / ownership | `·P·` | `·PO` | `·P·` | `·PO` | `·P·` | `·PO` | `·P·` |
+| conventional / executive | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | affordable / ops | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
 | affordable / marketing | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
+| affordable / leasing | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
 | affordable / maintenance | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
 | affordable / finance | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
+| affordable / regional | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
 | affordable / ownership | `AP·` | `APO` | `AP·` | `APO` | `AP·` | `APO` | `AP·` |
+| affordable / executive | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
 | student / ops | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | student / marketing | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
+| student / leasing | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | student / maintenance | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | student / finance | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
+| student / regional | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | student / ownership | `·P·` | `·PO` | `·P·` | `·PO` | `·P·` | `·PO` | `·P·` |
+| student / executive | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | senior / ops | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | senior / marketing | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
+| senior / leasing | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | senior / maintenance | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | senior / finance | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
+| senior / regional | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | senior / ownership | `·P·` | `·PO` | `·P·` | `·PO` | `·P·` | `·PO` | `·P·` |
+| senior / executive | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` | `·P·` |
 | lease_up / ops | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
 | lease_up / marketing | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
+| lease_up / leasing | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
 | lease_up / maintenance | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
 | lease_up / finance | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
+| lease_up / regional | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
 | lease_up / ownership | `AP·` | `APO` | `AP·` | `APO` | `AP·` | `APO` | `AP·` |
+| lease_up / executive | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` | `AP·` |
 
-105 of 175 combinations have no asset-specific content (all conventional, student and senior cells).
+168 of 280 combinations have no asset-specific content (all conventional, student and senior cells).
 

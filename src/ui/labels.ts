@@ -14,9 +14,12 @@ export const ASSET_LABEL: Record<AssetType, string> = {
 export const PERSONA_LABEL: Record<Persona, string> = {
   ops: 'Ops',
   marketing: 'Marketing',
+  leasing: 'Leasing',
   maintenance: 'Maintenance',
   finance: 'Finance',
+  regional: 'Regional',
   ownership: 'Ownership / AM',
+  executive: 'Exec / C-suite',
 };
 
 export const OWNERSHIP_LABEL: Record<Ownership, string> = {

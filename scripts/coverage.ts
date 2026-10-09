@@ -7,7 +7,7 @@ import { ENTRIES } from '../src/data/entries.ts';
 import { matches, resolve, specificity } from '../src/engine/resolve.ts';
 
 const dedicated = (state: CallState): Entry[] =>
-  ENTRIES.filter((e) => specificity(e.appliesTo) > 0 && matches(e.appliesTo, state));
+  ENTRIES.filter((e) => e.kind !== 'discovery' && specificity(e.appliesTo) > 0 && matches(e.appliesTo, state));
 
 const out: string[] = [];
 const p = (s = '') => out.push(s);
@@ -35,8 +35,11 @@ for (const [axis, values] of [
     const r = resolve({ ...blank, [axis]: v });
     const inferredOnly = ids.length > 0 && ids.every((e) => e.tagSource === 'inferred');
     const secondary = (SECONDARY_ASSET_TYPES as readonly string[]).includes(v) ? ' _(secondary, not a priority)_' : '';
+    const discoveryOnly = ids.length > 0 && ids.every((e) => e.kind === 'discovery');
     const status =
-      ids.length > 0
+      discoveryOnly
+        ? '◐ **discovery cues only — needs a talk track**'
+        : ids.length > 0
         ? inferredOnly
           ? '◐ inferred tags only — confirm'
           : '✓'
@@ -61,7 +64,7 @@ const axesHit = (state: CallState) => {
 p('## Full matrix');
 p();
 p('Each cell shows which classifiers contribute dedicated content: **A**sset, **P**ersona, **O**wnership (`·` = none,');
-p('that slot is general track). Student and senior rows never get an A. Lease-up gets an A from its capability note only.');
+p('that slot is general track). Discovery cues are not counted. Student and senior rows never get an A; lease-up gets one from its capability note only.');
 p();
 p('| Asset / Persona | ' + OWNERSHIP.join(' | ') + ' |');
 p('|---|' + OWNERSHIP.map(() => '---').join('|') + '|');
