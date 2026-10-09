@@ -6,11 +6,16 @@
 // fails the build if any segment is not an exact substring of the source.
 
 // ---------------------------------------------------------------------------
-// Classifiers — set once by the rep at the top of the call.
+// Classifiers — set once by the rep at the top of the call. Four rows:
+// asset, persona, ownership, PMS. Any row can be left unset.
 // ---------------------------------------------------------------------------
 
-export const ASSET_TYPES = ['conventional', 'affordable', 'student', 'senior'] as const;
+export const ASSET_TYPES = ['conventional', 'affordable', 'student', 'senior', 'lease_up'] as const;
 export type AssetType = (typeof ASSET_TYPES)[number];
+
+// Selectable but not a priority — rendered after the primary asset types,
+// and not targeted for content build-out.
+export const SECONDARY_ASSET_TYPES: readonly AssetType[] = ['lease_up'];
 
 export const PERSONAS = ['ops', 'marketing', 'maintenance', 'finance', 'ownership'] as const;
 export type Persona = (typeof PERSONAS)[number];
@@ -26,9 +31,8 @@ export const OWNERSHIP = [
 ] as const;
 export type Ownership = (typeof OWNERSHIP)[number];
 
-// Optional modifier, not one of the three core classifiers. The doc's
-// "one system" objection and the Yardi/AppFolio/Entrata/RealPage rebuttals
-// are keyed to the prospect's PMS, which none of the three axes capture.
+// Fourth classifier. The doc's "one system" objection and the
+// Yardi/AppFolio/Entrata/RealPage rebuttals are keyed to the prospect's PMS.
 export const PMS = ['yardi', 'appfolio', 'entrata', 'realpage', 'other'] as const;
 export type Pms = (typeof PMS)[number];
 

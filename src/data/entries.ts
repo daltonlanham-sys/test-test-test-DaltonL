@@ -24,7 +24,8 @@ const S10 = '10. Follow-Up Email Patterns';
 const FEE_MANAGED_OWNERS = ['owner_only', 'private_equity', 'joint_venture'] as const;
 
 // Default "what to say next" from any general opener.
-const GENERAL_NEXT = ['track.high_level', 'proof.leasing_ai', 'proof.delinquency', 'proof.lease_audits'];
+// track.lease_up only surfaces when asset = lease_up (nextFor filters by state).
+const GENERAL_NEXT = ['track.lease_up', 'track.high_level', 'proof.leasing_ai', 'proof.delinquency', 'proof.lease_audits'];
 
 export const ENTRIES: readonly Entry[] = [
   // ── 1. Openers ──────────────────────────────────────────────────────────
@@ -68,6 +69,7 @@ export const ENTRIES: readonly Entry[] = [
     appliesTo: ALL,
     tagSource: 'general',
     next: [
+      'track.lease_up',
       'proof.leasing_ai',
       'proof.voice_ai',
       'proof.delinquency',
@@ -208,7 +210,7 @@ export const ENTRIES: readonly Entry[] = [
     ],
     appliesTo: only({ persona: ['ownership'] }),
     tagSource: 'doc',
-    next: ['noi.frame', 'track.owner_past_fee_manager', 'track.capex'],
+    next: ['track.lease_up', 'noi.frame', 'track.owner_past_fee_manager', 'track.capex'],
     source: { section: S2, heading: 'Ownership — portfolio performance framing' },
   },
   {
@@ -396,10 +398,9 @@ export const ENTRIES: readonly Entry[] = [
         'Elise supports every phase of the lease-up lifecycle in EliseCRM: timeline config (pre-leasing, grand openings, move-ins), pricing/floorplans before live PMS data, waitlist capture, and tour logistics (hard-hat tours, virtual links). Nothing matters as much as lease-up velocity.',
       ),
     ],
-    appliesTo: only({ ownership: ['merchant_builder'] }),
-    tagSource: 'inferred',
-    tagNote:
-      'Doc treats lease-up/development as an asset-type track, but lease-up is not one of the four asset types. Mapped to merchant builder. Alternative: add a "lease-up" modifier toggle.',
+    appliesTo: only({ asset: ['lease_up'] }),
+    tagSource: 'doc',
+    tagNote: 'Section 7 names this the lease-up/development track under asset type.',
     next: ['proof.aigt'],
     source: { section: S3, heading: 'Lease-up / development' },
   },
@@ -763,7 +764,7 @@ export const ENTRIES: readonly Entry[] = [
     appliesTo: only({ persona: ['ops'] }),
     tagSource: 'doc',
     tagNote: 'Script is addressed to "ops leaders".',
-    next: ['discovery.property_managers', 'track.high_level', 'proof.voice_ai', 'proof.delinquency'],
+    next: ['track.lease_up', 'discovery.property_managers', 'track.high_level', 'proof.voice_ai', 'proof.delinquency'],
     source: { section: S8, heading: 'Operational efficiency angle' },
   },
   {
@@ -778,7 +779,7 @@ export const ENTRIES: readonly Entry[] = [
     appliesTo: only({ persona: ['marketing'] }),
     tagSource: 'inferred',
     tagNote: 'Leasing/lead-capture angle with no persona label. Mapped to marketing (owns lead spend and leasing funnel).',
-    next: ['proof.leasing_ai', 'proof.voice_ai', 'track.zillow'],
+    next: ['track.lease_up', 'proof.leasing_ai', 'proof.voice_ai', 'track.zillow'],
     source: { section: S8, heading: 'Leasing / vacancy angle' },
   },
   {
@@ -821,7 +822,7 @@ export const ENTRIES: readonly Entry[] = [
     appliesTo: only({ persona: ['finance'] }),
     tagSource: 'inferred',
     tagNote: 'Addressed to someone who "handles audit responsibilities". Mapped to finance.',
-    next: ['proof.lease_audits', 'proof.delinquency'],
+    next: ['track.lease_up', 'proof.lease_audits', 'proof.delinquency'],
     source: { section: S8, heading: 'Lease audit opener' },
   },
   {
@@ -1061,6 +1062,13 @@ export const GAPS: readonly Gap[] = [
     appliesTo: { asset: ['senior'] },
     description: 'No dedicated senior housing talk track. Falls back to the general multifamily track.',
     source: '7. The Gap to Fill',
+  },
+  {
+    id: 'gap.lease_up',
+    appliesTo: { asset: ['lease_up'] },
+    description:
+      'Lease-up has a capability note but no opener and no read-aloud script. Uses the general opener. Not a build-out priority.',
+    source: '3. Product Talk Tracks & Proof Points',
   },
   {
     id: 'gap.affordable_close',

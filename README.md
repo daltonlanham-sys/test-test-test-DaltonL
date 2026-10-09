@@ -1,6 +1,6 @@
 # EliseAI SDR Talk Track Tool
 
-Live cold-call companion for SDRs. The rep sets the asset type, persona and ownership structure, and the tool loads the right opener and objection buttons. All content comes from `content/master-reference.md`.
+Live cold-call companion for SDRs. The rep sets the asset type, persona, ownership structure and PMS, and the tool loads the right opener and objection buttons. All content comes from `content/master-reference.md`.
 
 - `docs/ARCHITECTURE.md`: data model, component structure, open decisions
 - `docs/COVERAGE.md`: which classifier combinations have dedicated content (generated)

@@ -1,6 +1,6 @@
 # SDR Talk Track Tool: architecture proposal
 
-The goal is speed on a live call. The rep sets three classifiers when the call starts. That **state** chooses the opener and the objection buttons. From there the rep moves through a **tree** of talk tracks. Every word on screen comes from `content/master-reference.md`.
+The goal is speed on a live call. The rep sets four classifiers when the call starts: asset type, persona, ownership structure and PMS. That **state** chooses the opener and the objection buttons. From there the rep moves through a **tree** of talk tracks. Every word on screen comes from `content/master-reference.md`.
 
 ## 1. Data model (built: `src/data/`)
 
@@ -29,7 +29,7 @@ Entry {
 - **69 entries.** Every talk track, rebuttal, proof point, deep-dive item and follow-up is its own entry.
 - **Verbatim is enforced.** `npm run verify` fails if any segment is not an exact substring of the source doc. It also fails if any substantive line of the doc is not captured, so nothing gets silently dropped. I tested both failures by changing one word and by deleting one entry.
 - **General content is the fallback.** Untagged multifamily content is `'*'` on every axis, so it matches every combination.
-- **The tags show where they came from.** `doc` means the doc itself labels the content (NOI pitch → ownership persona, Section 4 → affordable, maintenance objections → maintenance). `inferred` means I mapped it from the wording; the UI shows a small badge and `tagNote` explains the mapping. Five entries are inferred (§5).
+- **The tags show where they came from.** `doc` means the doc itself labels the content (NOI pitch → ownership persona, Section 4 → affordable, maintenance objections → maintenance). `inferred` means I mapped it from the wording; the UI shows a small badge and `tagNote` explains the mapping. Four entries are inferred (§5).
 - **`REFERENCES`** lists the six sources the doc names. All have `url: null` because the doc gives no links. The doc does not reference a Yardi deck or an objection spreadsheet.
 - **`GAPS`** lists student, senior, the missing affordable close, the maintenance opener and the third-party fee manager script. The UI shows the relevant gap when the classifier state hits it.
 
@@ -64,10 +64,10 @@ What the objection row shows in some example states:
 ```
 <App>                         state: CallState, navStack: EntryId[]
 ├─ <ClassifierBar>            pinned top, always visible
-│   ├─ <SegmentRow axis="asset">       Conventional | Affordable | Student | Senior
+│   ├─ <SegmentRow axis="asset">       Conventional | Affordable | Student | Senior ┊ Lease-up (secondary, smaller)
 │   ├─ <SegmentRow axis="persona">     Ops | Marketing | Maintenance | Finance | Ownership
 │   ├─ <SegmentRow axis="ownership">   Owner-op | Owner-only | 3rd-party | PE | Merchant | JV | REIT
-│   ├─ <SegmentRow axis="pms" optional> Yardi | AppFolio | Entrata | RealPage | Other
+│   ├─ <SegmentRow axis="pms">         Yardi | AppFolio | Entrata | RealPage | Other
 │   └─ <NewCallButton>                 clears state + stack
 ├─ <StatusStrip>              "General track" badge · gap notices · "inferred tag" badge
 ├─ <Breadcrumb>               Opener › High level › [Objection: One system]   ← Back
@@ -96,6 +96,7 @@ What the objection row shows in some example states:
 - **Ownership:** portfolio opener → NOI frame → OpEx → Revenue → Renewals → Delinquency → Close. Side branches: CapEx, and fee-manager framing for fee-managed owners.
 - **Affordable:** Open → Numbers → Screened-out → Recerts → Fitch Irick proof → *(no close script, flagged)*.
 - **Ops:** ops-efficiency opener → property-manager discovery cues / high level / Voice AI / Delinquency.
+- **Lease-up:** every phone opener → Lease-up track (shown only when asset = lease-up) → AI-Guided Tours proof.
 - **Finance:** lease-audit opener → Lease Audits proof → Delinquency.
 - **Yardi:** One system → Yardi integration framing.
 
@@ -106,21 +107,26 @@ See `docs/COVERAGE.md` (generated) for the full asset × persona × ownership gr
 - **Student and senior housing:** no dedicated content. They fall back to the general track and show a "needs build-out" notice. (Section 7 of the doc confirms this.)
 - **Affordable close:** the doc lists a close beat but gives no close script.
 - **Maintenance persona:** has rebuttals and proof, but no opener.
+- **Lease-up (secondary):** one capability note, no opener and no read-aloud script. Not a build-out priority.
 - **Ownership structures:**
   - Owner-operator, third-party fee manager and REIT have no dedicated content.
-  - Owner-only, PE, JV and merchant builder have inferred tags only.
+  - Merchant builder has no dedicated content. The rep picks Lease-up as the asset type to get the lease-up track.
+  - Owner-only, PE and JV have only an inferred tag (the fee-manager track).
 
-## 5. Decisions I need you to confirm
+## 5. Decisions
 
-1. **A PMS modifier as a fourth, optional row.** The "one system" objection and the Yardi, AppFolio and Entrata/RealPage rebuttals depend on the prospect's PMS, and none of the three classifiers capture that. Without a PMS row, "Yardi-heavy" can't trigger anything.
-2. **"One system" for Yardi only, or for any PMS suite?** The doc heading says "Yardi/PMS consolidation", but the script names Yardi. I currently trigger it on Yardi only.
-3. **Inferred tags (5 entries):**
-   - Leasing/vacancy opener → marketing
-   - Lease-audit opener → finance
-   - CapEx → ownership + finance
-   - Fee-manager track → owner-only, PE, JV (not REIT)
-   - Lease-up → merchant builder
-4. **The persona list:** ops, marketing, maintenance, finance, ownership. Add others (IT/tech, executive) only once content exists for them.
+Confirmed:
+1. **PMS is the fourth classifier row.** Yardi | AppFolio | Entrata | RealPage | Other. It can be left unset, like the other rows.
+2. **"One system" triggers on Yardi only for now**, even though the doc heading says "Yardi/PMS consolidation". To extend it, change `appliesTo.pms` on `obj.one_system`.
+3. **Lease-up is a secondary asset type.** You can select it, but it renders after the four primary types and isn't targeted for build-out. `track.lease_up` is now tagged `asset: lease_up` with `tagSource: doc` (Section 7 calls it the lease-up/development track). It is no longer mapped to merchant builder.
+
+Still open:
+- **Inferred tags (4 entries):**
+  - Leasing/vacancy opener → marketing
+  - Lease-audit opener → finance
+  - CapEx → ownership + finance
+  - Fee-manager track → owner-only, PE, JV (not REIT)
+- **The persona list:** ops, marketing, maintenance, finance, ownership. Add others (IT/tech, executive) only once content exists for them.
 
 ## 6. Content inconsistencies in the source doc (left as written)
 
